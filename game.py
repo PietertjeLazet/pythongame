@@ -10,7 +10,7 @@ screen = pygame.display.set_mode((1600,800))
 pygame.display.set_caption('Pvv invaders')
 clock = pygame.time.Clock()
 
-bg = pygame.image.load(r"C:\Users\piete\OneDrive\Afbeeldingen\nederland.png")
+bg = pygame.image.load("nederland.png")
 bg = pygame.transform.scale(bg, (1600, 800))
 
 def player_setup():
