@@ -8,7 +8,7 @@ player_pos = 0
 
 mixer.init()
 mixer.music.load('achtergrondsound.mp3')
-mixer.music.set_volume(0.2)
+mixer.music.set_volume(1)
 mixer.music.play()
 
 pygame.init()
@@ -27,7 +27,8 @@ icon = pygame.image.load("geert.jpg")
 
 pygame.display.set_icon(icon)
 
-
+shot = pygame.mixer.Sound("spugen.mp3")
+enemy = pygame.mixer.Sound("wildersminderkaag.mp3")
 
 def player_setup():
     global player_pos
@@ -53,7 +54,6 @@ def player_move(motion):
 
 def player_show():
     pygame.draw.rect(screen, "red", rect, 1)
-    
 
 while True:
     for event in pygame.event.get():
@@ -71,6 +71,11 @@ while True:
         player_move("left")
     if keys[pygame.K_d]:
         player_move("right")
+    if keys[pygame.K_SPACE]:
+        shot.play()
+        pygame.time.delay(2000)
+    if keys[pygame.K_u]:
+        enemy.play()
 
     player_show()
     pygame.display.update()
