@@ -1,7 +1,8 @@
 import pygame
 from sys import exit
 from pygame.locals import *
-from pygame import mixer 
+from pygame import mixer
+import random
 
 player = []
 player_pos = 0
@@ -52,6 +53,13 @@ def player_setup():
     
 player_setup() 
 
+game_over_font = pygame.font.Font(None, 100)
+game_over_text = game_over_font.render("Game Over", True, (255, 0, 0))
+game_over_rect = game_over_text.get_rect(center=(800, 400))
+
+you_won_font = pygame.font.Font(None, 100)
+you_won_text = you_won_font.render("You Won", True, (0, 255, 0))
+you_won_rect = you_won_text.get_rect(center=(800, 400))
 
 
 def player_move(motion):
@@ -84,17 +92,38 @@ class Enemy:
     def __init__(self, pos):
         self.pos = pos
         self.vel = 0.05
+        self.Hvel = 10
         self.width = 10
         self.height = 30
         self.radius = 20
+        self.img = pygame.image.load("kaag.jpg")  # Load the kaag image
+        self.img = pygame.transform.scale(self.img, (40, 40))  # Adjust the size as needed
 
     def draw(self, window):
-        pygame.draw.circle(window, "red", tuple(map(int, self.pos)), self.radius)
-        
+        window.blit(self.img, (int(self.pos[0] - self.img.get_width() / 2), int(self.pos[1] - self.img.get_height() / 2)))
+
     def update(self):
         self.pos = (self.pos[0], self.pos[1] + self.vel)
 
+    def move_horizontally(self):
+        self.pos = (self.pos[0] + self.Hvel, self.pos[1])
+        self.Hvel = self.Hvel * -1
 
+class EnemyBullet:
+    def __init__(self, pos, vel, img):
+        self.pos = pos
+        self.vel = 2  # Adjust the bullet velocity as needed
+        self.img = img
+        self.radius = 5
+
+    def draw(self, window):
+        window.blit(self.img, (int(self.pos[0]), int(self.pos[1])))
+
+    def update(self):
+        self.pos = (self.pos[0], self.pos[1] + self.vel)
+        
+enemy_bullets = []
+enemy_shoot_timer = 0
         
 for j in range(4):  # Two rows
     for i in range(10):  # Ten enemies per row
@@ -134,6 +163,7 @@ while True:
         bullet.update()
         bullet.draw(screen)
     for enemy in enemies:
+        enemy.move_horizontally()
         enemy.update()
         enemy.draw(screen)
         
@@ -148,8 +178,40 @@ while True:
             bullets.remove(bullet)
 
 
+    if pygame.time.get_ticks() - enemy_shoot_timer >= 2000:
+        random_enemy = random.choice(enemies)
+        enemy_bullets.append(EnemyBullet(random_enemy.pos, 1, bullet_img))
+        enemy_shoot_timer = pygame.time.get_ticks()
+
+    # Update enemy bullets
+    for enemy_bullet in enemy_bullets:
+        enemy_bullet.update()
+        enemy_bullet.draw(screen)
+
+    # Check for collisions with player
+    for enemy_bullet in enemy_bullets[:]:
+        dist = ((enemy_bullet.pos[0] - player_pos.x)**2 + (enemy_bullet.pos[1] - player_pos.y)**2)**0.5
+        if dist < enemy_bullet.radius + rect.width / 2:
+            # Handle player hit (e.g., decrease player life)
+            enemy_bullets.remove(enemy_bullet)
+            # Stop the game and display "Game Over"
+            screen.blit(game_over_text, game_over_rect)
+            pygame.display.update()
+            pygame.time.delay(5000)  # Pause for 2 seconds
+            pygame.quit()
+            exit()
+
     player_show()
     pygame.display.update()
+    
+                
+    if not enemies:
+        screen.blit(you_won_text, you_won_rect)
+        pygame.display.update()
+        pygame.time.delay(5000)  # Pause for 2 seconds
+        pygame.quit()
+        exit()
+    
     clock.tick(150)
 
     #print(clock.get_fps())
