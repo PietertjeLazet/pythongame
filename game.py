@@ -45,9 +45,7 @@ last_bullet_time = -1000
 
 def player_setup():
     global player_pos
-    #x
     player.append(int(800))
-    #y
     player.append(int(700))
     player_pos = pygame.Vector2(player[0], player[1])
     
@@ -80,7 +78,7 @@ class Bullet:
         self.pos = pos
         self.vel = 4
         self.img = img
-        self.radius = 5  # Set a fixed radius for the bullet
+        self.radius = 5  
 
     def draw(self, window):
         window.blit(self.img, (int(self.pos[0]), int(self.pos[1])))
@@ -96,8 +94,8 @@ class Enemy:
         self.width = 10
         self.height = 30
         self.radius = 20
-        self.img = pygame.image.load("kaag.jpg")  # Load the kaag image
-        self.img = pygame.transform.scale(self.img, (40, 40))  # Adjust the size as needed
+        self.img = pygame.image.load("kaag.jpg")
+        self.img = pygame.transform.scale(self.img, (40, 40))
 
     def draw(self, window):
         window.blit(self.img, (int(self.pos[0] - self.img.get_width() / 2), int(self.pos[1] - self.img.get_height() / 2)))
@@ -112,7 +110,7 @@ class Enemy:
 class EnemyBullet:
     def __init__(self, pos, vel, img):
         self.pos = pos
-        self.vel = 2  # Adjust the bullet velocity as needed
+        self.vel = 2 
         self.img = img
         self.radius = 5
 
@@ -125,9 +123,9 @@ class EnemyBullet:
 enemy_bullets = []
 enemy_shoot_timer = 0
         
-for j in range(4):  # Two rows
-    for i in range(10):  # Ten enemies per row
-        enemies.append(Enemy([40 + i*160, 30 + j*60]))  # Adjust the vertical position for each row
+for j in range(4):
+    for i in range(10):
+        enemies.append(Enemy([40 + i*160, 30 + j*60]))
 
 
 while True:
@@ -183,21 +181,17 @@ while True:
         enemy_bullets.append(EnemyBullet(random_enemy.pos, 1, bullet_img))
         enemy_shoot_timer = pygame.time.get_ticks()
 
-    # Update enemy bullets
     for enemy_bullet in enemy_bullets:
         enemy_bullet.update()
         enemy_bullet.draw(screen)
 
-    # Check for collisions with player
     for enemy_bullet in enemy_bullets[:]:
         dist = ((enemy_bullet.pos[0] - player_pos.x)**2 + (enemy_bullet.pos[1] - player_pos.y)**2)**0.5
         if dist < enemy_bullet.radius + rect.width / 2:
-            # Handle player hit (e.g., decrease player life)
             enemy_bullets.remove(enemy_bullet)
-            # Stop the game and display "Game Over"
             screen.blit(game_over_text, game_over_rect)
             pygame.display.update()
-            pygame.time.delay(5000)  # Pause for 2 seconds
+            pygame.time.delay(5000)
             pygame.quit()
             exit()
 
@@ -208,7 +202,7 @@ while True:
     if not enemies:
         screen.blit(you_won_text, you_won_rect)
         pygame.display.update()
-        pygame.time.delay(5000)  # Pause for 2 seconds
+        pygame.time.delay(5000)
         pygame.quit()
         exit()
     
