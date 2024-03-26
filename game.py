@@ -43,6 +43,8 @@ enemy = pygame.mixer.Sound("wildersminderkaag.mp3")
 
 last_bullet_time = -1000
 
+biem_sound = pygame.mixer.Sound("biem.mp3")
+
 def player_setup():
     global player_pos
     player.append(int(800))
@@ -127,86 +129,99 @@ for j in range(4):
     for i in range(10):
         enemies.append(Enemy([40 + i*160, 30 + j*60]))
 
+game_started = False
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
+        elif event.type == pygame.MOUSEBUTTONDOWN and not game_started:
+            game_started = True
             
-    
-    rect.center = player_pos[0], player_pos[1]
-    screen.blit(bg, (0,0))
-    
-    screen.blit(img, rect)
-    
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_a]:
-        player_move("left")
-    if keys[pygame.K_d]:
-        player_move("right")
-    if keys[pygame.K_SPACE]:
-        current_time = pygame.time.get_ticks()
-        if current_time - last_bullet_time >= 500:
-            bullets.append(Bullet(player_pos, 1, bullet_img))
-            last_bullet_time = current_time
-    if keys[pygame.K_u]:
-        enemy.play()
-    if keys[pygame.K_r]:
-        shot.play()
-        pygame.time.delay(2000)
+    if not game_started:
+        start_font = pygame.font.Font(None, 80)
+        start_text = start_font.render("Click 'Start' to play", True, (255, 255, 255))
+        start_rect = start_text.get_rect(center=(800, 400))
+        screen.blit(start_text, start_rect)
         
-
-    
-    for bullet in bullets:
-        bullet.update()
-        bullet.draw(screen)
-    for enemy in enemies:
-        enemy.move_horizontally()
-        enemy.update()
-        enemy.draw(screen)
+    else:
+        rect.center = player_pos[0], player_pos[1]
+        screen.blit(bg, (0,0))
         
-    for bullet in bullets[:]:
-        for enemy in enemies[:]:
-            dist = ((bullet.pos[0] - enemy.pos[0])**2 + (bullet.pos[1] - enemy.pos[1])**2)**0.5
-            if dist < bullet.radius + enemy.radius:
-                bullets.remove(bullet)  
-                enemies.remove(enemy)
-                break
-        if bullet.pos[1] < 0:
-            bullets.remove(bullet)
+        screen.blit(img, rect)
+        
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a]:
+            player_move("left")
+        if keys[pygame.K_d]:
+            player_move("right")
+        if keys[pygame.K_SPACE]:
+            current_time = pygame.time.get_ticks()
+            if current_time - last_bullet_time >= 500:
+                bullets.append(Bullet(player_pos, 1, bullet_img))
+                last_bullet_time = current_time
+                biem_sound.play()
+        if keys[pygame.K_u]:
+            enemy.play()
+        if keys[pygame.K_r]:
+            shot.play()
+            pygame.time.delay(2000)
+            
+
+        
+        for bullet in bullets:
+            bullet.update()
+            bullet.draw(screen)
+        for enemy in enemies:
+            enemy.move_horizontally()
+            enemy.update()
+            enemy.draw(screen)
+            
+        for bullet in bullets[:]:
+            for enemy in enemies[:]:
+                dist = ((bullet.pos[0] - enemy.pos[0])**2 + (bullet.pos[1] - enemy.pos[1])**2)**0.5
+                if dist < bullet.radius + enemy.radius:
+                    bullets.remove(bullet)  
+                    enemies.remove(enemy)
+                    break
+            if bullet.pos[1] < 0:
+                bullets.remove(bullet)
 
 
-    if pygame.time.get_ticks() - enemy_shoot_timer >= 2000:
-        random_enemy = random.choice(enemies)
-        enemy_bullets.append(EnemyBullet(random_enemy.pos, 1, bullet_img))
-        enemy_shoot_timer = pygame.time.get_ticks()
+        if pygame.time.get_ticks() - enemy_shoot_timer >= 1000:
+            random_enemy = random.choice(enemies)
+            enemy_bullets.append(EnemyBullet(random_enemy.pos, 1, bullet_img))
+            enemy_shoot_timer = pygame.time.get_ticks()
 
-    for enemy_bullet in enemy_bullets:
-        enemy_bullet.update()
-        enemy_bullet.draw(screen)
+        for enemy_bullet in enemy_bullets:
+            enemy_bullet.update()
+            enemy_bullet.draw(screen)
 
-    for enemy_bullet in enemy_bullets[:]:
-        dist = ((enemy_bullet.pos[0] - player_pos.x)**2 + (enemy_bullet.pos[1] - player_pos.y)**2)**0.5
-        if dist < enemy_bullet.radius + rect.width / 2:
-            enemy_bullets.remove(enemy_bullet)
-            screen.blit(game_over_text, game_over_rect)
+        for enemy_bullet in enemy_bullets[:]:
+            dist = ((enemy_bullet.pos[0] - player_pos.x)**2 + (enemy_bullet.pos[1] - player_pos.y)**2)**0.5
+            if dist < enemy_bullet.radius + rect.width / 2:
+                enemy_bullets.remove(enemy_bullet)
+                screen.blit(game_over_text, game_over_rect)
+                pygame.display.update()
+                pygame.time.delay(5000)
+                pygame.quit()
+                exit()
+            if enemy_bullet.pos[1] > 800:
+                enemy_bullets.remove(enemy_bullet)
+        
+                    
+        if not enemies:
+            mixer.music.stop()
+            screen.blit(you_won_text, you_won_rect)
             pygame.display.update()
+            mixer.music.load('wildersminderkaag.mp3')
+            mixer.music.play()
             pygame.time.delay(5000)
             pygame.quit()
             exit()
-
-    player_show()
-    pygame.display.update()
-    
-                
-    if not enemies:
-        screen.blit(you_won_text, you_won_rect)
-        pygame.display.update()
-        pygame.time.delay(5000)
-        pygame.quit()
-        exit()
-    
+        
+        
+        player_show()
+    pygame.display.update()    
     clock.tick(150)
-
-    #print(clock.get_fps())
         
