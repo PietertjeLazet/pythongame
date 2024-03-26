@@ -27,10 +27,8 @@ img = pygame.transform.scale(img, (150, 100))
 img.convert()
 rect = img.get_rect()
 
-m = pygame.image.load('kogel.jpg')
-m = pygame.transform.scale(m, (150, 100))
-m.convert()
-kogel = m.get_rect()
+bullet_img = pygame.image.load('kogel.jpg')
+bullet_img = pygame.transform.scale(bullet_img, (20, 20))  # Adjust the size as needed
 
 bg = pygame.image.load("nederland.png")
 bg = pygame.transform.scale(bg, (1600, 800))
@@ -69,18 +67,16 @@ def player_move(motion):
 def player_show():
     pygame.draw.rect(screen, "red", rect, 1)
 
-class Bullet(object):
-    def __init__(self, pos, vel):
+class Bullet:
+    def __init__(self, pos, vel, img):
         self.pos = pos
         self.vel = 4
-        self.width = 10
-        self.height = 30
-        self.radius = 20
-        
+        self.img = img
+        self.radius = 5  # Set a fixed radius for the bullet
+
     def draw(self, window):
-        pygame.draw.circle(window, "red", (int(self.pos[0]), int(self.pos[1])), self.radius)
-        pygame.draw.rect(window, "red", kogel, 1)
-        
+        window.blit(self.img, (int(self.pos[0]), int(self.pos[1])))
+
     def update(self):
         self.pos = (self.pos[0], self.pos[1] - self.vel)
         
@@ -124,7 +120,7 @@ while True:
     if keys[pygame.K_SPACE]:
         current_time = pygame.time.get_ticks()
         if current_time - last_bullet_time >= 500:
-            bullets.append(Bullet(player_pos, 1))
+            bullets.append(Bullet(player_pos, 1, bullet_img))
             last_bullet_time = current_time
     if keys[pygame.K_u]:
         enemy.play()
