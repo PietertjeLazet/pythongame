@@ -125,7 +125,7 @@ class EnemyBullet:
 enemy_bullets = []
 enemy_shoot_timer = 0
         
-for j in range(4):
+for j in range(1):
     for i in range(10):
         enemies.append(Enemy([40 + i*160, 30 + j*60]))
 
@@ -209,7 +209,14 @@ while True:
             if enemy_bullet.pos[1] > 800:
                 enemy_bullets.remove(enemy_bullet)
         
-                    
+        for enemy in enemies:
+            if enemy.pos[1] > 550:
+                screen.blit(game_over_text, game_over_rect)
+                pygame.display.update()
+                pygame.time.delay(5000)
+                pygame.quit()
+                exit()
+        
         if not enemies:
             mixer.music.stop()
             screen.blit(you_won_text, you_won_rect)
