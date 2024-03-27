@@ -125,7 +125,7 @@ class EnemyBullet:
 enemy_bullets = []
 enemy_shoot_timer = 0
         
-for j in range(1):
+for j in range(4):
     for i in range(10):
         enemies.append(Enemy([40 + i*160, 30 + j*60]))
 
